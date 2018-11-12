@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/jacobsa/go-serial/serial"
+	"github.com/ungerik/go-mavlink"
+	"io"
 	"log"
 	"os"
 	"strconv"
-	"io"
-	"github.com/ungerik/go-mavlink"
 )
 
 func main() {
@@ -71,17 +71,27 @@ func main() {
 	//		write(port1, &bytes, n)
 	//	}
 	//}
-
+	startFound := false
 	for {
 		n := read(port1, &bytes)
 		if n > 0 {
 			for _, b := range bytes[:n] {
-				packet, err := parser(b)
+				if !startFound {
+					if b == 0xFD {
+						startFound = true
+					}
+				}
+				var packet *mavlink.MavPacket
+				var err error
+				if startFound {
+					packet, err = parser(b)
+				}
 				if err != nil {
 					log.Fatal(err)
 
 				} else if packet != nil {
 					processPacket(packet)
+					startFound = false
 				}
 			}
 		}
