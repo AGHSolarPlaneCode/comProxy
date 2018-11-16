@@ -1,10 +1,12 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/jacobsa/go-serial/serial"
 	"github.com/ungerik/go-mavlink"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 )
@@ -15,6 +17,9 @@ func main() {
 		println("Usage: comProxy portName baudRate")
 		return
 	}
+
+	router := NewRouter()
+	log.Fatal(http.ListenAndServe(":8080", router))
 
 	port1Name := os.Args[1]
 	//port2Name := os.Args[2]
@@ -100,6 +105,7 @@ func main() {
 
 func processPacket(packet *mavlink.MavPacket) {
 	println(packet.Header.MessageID)
+	update(packet)
 }
 
 func read(port io.ReadWriteCloser, bytes *[]byte) int {
@@ -119,4 +125,10 @@ func write(port io.ReadWriteCloser, pbytes *[]byte, n int) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func setupRest() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", getGps)
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
