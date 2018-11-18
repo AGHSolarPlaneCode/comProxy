@@ -1,24 +1,39 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
-	"errors"
 	"github.com/ungerik/go-mavlink"
+	"log"
 )
 
-func decodeGlobalPosition(packet *mavlink.MavPacket) (*mavlink.GlobalPositionInt, error) {
-	if packet.Header.MessageID != 33 {
-		return nil, errors.New("message id must be 33")
+var globalPosition = &mavlink.GlobalPositionInt{}
+
+func update(packet *mavlink.MavPacket) {
+	switch packet.Header.MessageID {
+	case 30:
+		return
+		break
+	case 33:
+		updateGlobalPosition(packet)
+		break
 	}
-	body := packet.Bytes()
-	if packet.Header.PayloadLength < 28 {
-		diff := 28 - packet.Header.PayloadLength
-		salt := make([]byte, diff, diff)
-		body = append(body, salt...)
+	return
+}
+
+func updateGlobalPosition(packet *mavlink.MavPacket) {
+	position := decodeGlobalPosition(packet)
+	if position == nil {
+		return
 	}
-	res := mavlink.GlobalPositionInt{}
-	buff := bytes.NewReader(body)
-	err := binary.Read(buff, binary.LittleEndian, &res) //TODO little endian or big endian?
-	return &res, err
+	if position.TimeBootMs > globalPosition.TimeBootMs {
+		globalPosition = position
+	}
+}
+
+func decodeGlobalPosition(packet *mavlink.MavPacket) *mavlink.GlobalPositionInt {
+	messege, ok := packet.Msg.(*mavlink.GlobalPositionInt)
+	if !ok {
+		log.Fatal("failed to cast packet.Msg to mavlink.GlobalPositionInt.")
+		return nil
+	}
+	return messege
 }
