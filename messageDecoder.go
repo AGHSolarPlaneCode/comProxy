@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+//TODO remove
+
 var globalPosition = &mavlink.GlobalPositionInt{}
 
 func update(packet *mavlink.MavPacket) {

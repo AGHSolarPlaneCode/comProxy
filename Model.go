@@ -1,5 +1,7 @@
 package main
 
+//TODO remove
+
 type GlobalPosition struct {
 	TimeBootMs  uint32 `json:"timebootms"`
 	Lat         int32  `json:"lat"`
