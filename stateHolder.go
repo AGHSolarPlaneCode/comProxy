@@ -2,7 +2,7 @@ package main
 
 import "github.com/ungerik/go-mavlink"
 
-const GlobalPositionInt = 32
+const GlobalPositionInt = 33
 
 type stateHolder struct {
 	stateData stateData

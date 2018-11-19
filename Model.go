@@ -1,6 +1,11 @@
 package main
 
 //TODO remove
+/*
+Not so fast.
+Json field names created using mavlink.GlobalPositionInt class have capitalised first letters.
+
+*/
 
 type GlobalPosition struct {
 	TimeBootMs  uint32 `json:"timebootms"`
