@@ -48,7 +48,7 @@ func StartReader(portName string, baudRate uint, outChan chan *mavlink.MavPacket
 					packet, err = parser(b)
 				}
 				if err != nil {
-					log.Fatal(err)
+				//	log.Fatal(err)
 
 				} else if packet != nil {
 					outChan <- packet
