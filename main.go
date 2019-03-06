@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"time"
 )
 
 func main() {
@@ -21,8 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	dbFilename := time.Now().Format("2006.01.02 15:04:05") + ".sql"
-
+	dbFilename := "flightData.sql"
 	if len(os.Args) >= 4 {
 		dbFilename = os.Args[3]
 	}
