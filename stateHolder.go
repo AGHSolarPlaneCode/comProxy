@@ -1,12 +1,16 @@
 package main
 
-import "github.com/ungerik/go-mavlink"
+import (
+	"encoding/json"
+	"github.com/ungerik/go-mavlink"
+)
 
 const GlobalPositionInt = 33
 const AttitudeInt = 30
 
 type stateHolder struct {
 	stateData stateData
+	db        DbWrapper
 }
 
 type stateData struct {
@@ -23,28 +27,39 @@ func (sd *stateData) updateAT() {
 	sd.TelemetryData.SetAttitude(sd.Attitude)
 }
 
-func (s *stateHolder) startStateHolder(packetChan chan *mavlink.MavPacket) {
+func (s *stateHolder) startStateHolder(packetChan chan *mavlink.MavPacket, dbFilename string) {
 	s.stateData = stateData{}
 	s.stateData.TelemetryData = &TelemetryData{}
+	s.db = DbWrapper{}
+	s.db.initialize(dbFilename)
+
 	var packet *mavlink.MavPacket
 	for {
 		packet = <-packetChan
-		processPacket(packet, &s.stateData)
+		s.processPacket(packet)
 	}
 }
 
-func processPacket(packet *mavlink.MavPacket, stateData *stateData) {
+func (s *stateHolder) processPacket(packet *mavlink.MavPacket) {
 	switch packet.Msg.ID() {
 	case GlobalPositionInt:
-		stateData.GlobalPositionInt = packet.Msg.(*mavlink.GlobalPositionInt)
-		stateData.updateGP()
+		s.stateData.GlobalPositionInt = packet.Msg.(*mavlink.GlobalPositionInt)
+		s.stateData.updateGP()
+		s.insertIntoDb(s.stateData.GlobalPositionInt, GlobalPositionInt)
 		break
 	case AttitudeInt:
-		stateData.Attitude = packet.Msg.(*mavlink.Attitude)
-		stateData.updateAT()
+		s.stateData.Attitude = packet.Msg.(*mavlink.Attitude)
+		s.stateData.updateAT()
+		s.insertIntoDb(s.stateData.Attitude, AttitudeInt)
 		break
 	}
-
-	//TODO save in database
 	//TODO add information about last update time
+}
+
+func (s *stateHolder) insertIntoDb(object interface{}, dataType int) {
+	jsonEncoded, err := json.Marshal(s.stateData.TelemetryData)
+	if err != nil {
+		panic(err)
+	}
+	s.db.insert(dataType, string(jsonEncoded))
 }
