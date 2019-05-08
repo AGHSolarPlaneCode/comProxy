@@ -35,7 +35,7 @@ func (dbw *DbWrapper) initialize(filename string) {
 }
 
 func (dbw *DbWrapper) insert(dataType int, data string) {
-	stmt, err := dbw.db.Prepare("insert into flight_data(data_type, data_stirng ) values(?,?)")
+	stmt, err := dbw.db.Prepare("insert into flight_data(data_type, data_string ) values(?,?)")
 	if err != nil {
 		log.Fatal(err)
 	}
