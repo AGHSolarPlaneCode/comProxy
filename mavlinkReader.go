@@ -28,6 +28,16 @@ func StartReader(portName string, baudRate uint, outChan chan *mavlink.MavPacket
 
 	defer port.Close()
 
+	readerLoop(port, outChan)
+}
+
+func readerLoop(port io.ReadWriteCloser, outChan chan *mavlink.MavPacket) {
+	defer func() {
+		if r := recover(); r != nil {
+			readerLoop(port, outChan)
+		}
+	}()
+
 	parser := mavlink.GetMavParser()
 
 	bytes := make([]byte, frameSize)
@@ -48,7 +58,7 @@ func StartReader(portName string, baudRate uint, outChan chan *mavlink.MavPacket
 					packet, err = parser(b)
 				}
 				if err != nil {
-				//	log.Fatal(err)
+					//	log.Fatal(err)
 
 				} else if packet != nil {
 					outChan <- packet
