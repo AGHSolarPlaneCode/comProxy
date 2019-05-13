@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/jacobsa/go-serial/serial"
 	"github.com/ungerik/go-mavlink"
 	"io"
@@ -34,6 +35,7 @@ func StartReader(portName string, baudRate uint, outChan chan *mavlink.MavPacket
 func readerLoop(port io.ReadWriteCloser, outChan chan *mavlink.MavPacket) {
 	defer func() {
 		if r := recover(); r != nil {
+			fmt.Println("Recovering from a parser error")
 			readerLoop(port, outChan)
 		}
 	}()
