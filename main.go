@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ungerik/go-mavlink"
+	"github.com/gswly/gomavlib"
 	"log"
 	"os"
 	"strconv"
@@ -25,8 +25,8 @@ func main() {
 		dbFilename = os.Args[3]
 	}
 
-	packetChannel := make(chan *mavlink.MavPacket)
-	go StartReader(os.Args[1], uint(baudRate), packetChannel)
+	packetChannel := make(chan *gomavlib.EventFrame)
+	go StartReader(os.Args[1], int(baudRate), packetChannel)
 
 	stateHolder := stateHolder{}
 	go stateHolder.startStateHolder(packetChannel, dbFilename)
