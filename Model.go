@@ -28,6 +28,13 @@ type TelemetryData struct {
 	Yawspeed    float32 `json:"yawspeed"`
 }
 
+type GpsData struct {
+	Lat    int32
+	Lon    int32
+	LatRaw int32
+	LonRaw int32
+}
+
 func (td *TelemetryData) SetGlobalPosition(gps *common.MessageGlobalPositionInt) {
 	td.Lat = gps.Lat
 	td.Lon = gps.Lon
@@ -46,4 +53,14 @@ func (td *TelemetryData) SetAttitude(at *common.MessageAttitude) {
 	td.Rollspeed = at.Rollspeed
 	td.Pitchspeed = at.Pitchspeed
 	td.Yawspeed = at.Yawspeed
+}
+
+func (gps *GpsData) SetGlobalPositionInt(pos *common.MessageGlobalPositionInt) {
+	gps.Lon = pos.Lon
+	gps.Lat = pos.Lat
+}
+
+func (gps *GpsData) SetRawGps(raw *common.MessageGpsRawInt) {
+	gps.LatRaw = raw.Lat
+	gps.LonRaw = raw.Lon
 }

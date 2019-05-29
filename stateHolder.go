@@ -8,6 +8,8 @@ import (
 
 const GlobalPositionInt = 33
 const AttitudeInt = 30
+const RawGps = 24
+const Hud = 74
 
 type stateHolder struct {
 	stateData stateData
@@ -17,11 +19,17 @@ type stateHolder struct {
 type stateData struct {
 	GlobalPosition *common.MessageGlobalPositionInt
 	Attitude       *common.MessageAttitude
-	TelemetryData  *TelemetryData
+	GpsRaw         *common.MessageGpsRawInt
+	HudData        *common.MessageVfrHud
+	GpsData        *GpsData
+
+	TelemetryData *TelemetryData
 }
 
 func (s *stateHolder) startStateHolder(packetChan chan *gomavlib.EventFrame, dbFilename string) {
 	s.stateData = stateData{}
+	s.stateData.TelemetryData = &TelemetryData{}
+	s.stateData.GpsData = &GpsData{}
 	s.db = DbWrapper{}
 	s.db.initialize(dbFilename)
 
@@ -36,6 +44,7 @@ func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
 	if gps, ok := packet.Message().(*common.MessageGlobalPositionInt); ok {
 		s.stateData.GlobalPosition = gps
 		s.stateData.TelemetryData.SetGlobalPosition(gps)
+		s.stateData.GpsData.SetGlobalPositionInt(gps)
 		s.insertIntoDb(s.stateData.GlobalPosition, GlobalPositionInt)
 	}
 
@@ -44,6 +53,18 @@ func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
 		s.stateData.TelemetryData.SetAttitude(att)
 		s.insertIntoDb(s.stateData.Attitude, AttitudeInt)
 	}
+
+	if mess, ok := packet.Message().(*common.MessageGpsRawInt); ok {
+		s.stateData.GpsData.SetRawGps(mess)
+		s.stateData.GpsRaw = mess
+		s.insertIntoDb(s.stateData.GpsRaw, RawGps)
+	}
+
+	if mess, ok := packet.Message().(*common.MessageVfrHud); ok {
+		s.stateData.HudData = mess
+		s.insertIntoDb(s.stateData.HudData, Hud)
+	}
+
 	//TODO add information about last update time
 }
 

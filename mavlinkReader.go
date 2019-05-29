@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gswly/gomavlib"
 	"github.com/gswly/gomavlib/dialects/common"
 	"strconv"
@@ -24,7 +23,7 @@ func StartReader(portName string, baudRate int, outChan chan *gomavlib.EventFram
 	for {
 		for evt := range node.Events() {
 			if frm, ok := evt.(*gomavlib.EventFrame); ok {
-				fmt.Printf("received: id=%d, %+v\n", frm.Message().GetId(), frm.Message())
+				//fmt.Printf("received: id=%d, %+v\n", frm.Message().GetId(), frm.Message())
 				outChan <- frm
 			}
 		}
