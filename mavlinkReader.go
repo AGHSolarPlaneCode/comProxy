@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gswly/gomavlib"
-	"github.com/gswly/gomavlib/dialects/ardupilotmega"
+	"github.com/gswly/gomavlib/dialects/common"
 	"strconv"
 )
 
@@ -13,7 +13,7 @@ func StartReader(portName string, baudRate int, outChan chan *gomavlib.EventFram
 		Endpoints: []gomavlib.EndpointConf{
 			gomavlib.EndpointSerial{Address: portName + ":" + strconv.Itoa(baudRate)},
 		},
-		Dialect:     ardupilotmega.Dialect,
+		Dialect:     common.Dialect,
 		OutSystemId: 10,
 	})
 	if err != nil {

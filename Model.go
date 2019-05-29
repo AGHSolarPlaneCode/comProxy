@@ -1,7 +1,7 @@
 package main
 
 import (
-	dialect "github.com/gswly/gomavlib/dialects/common"
+	"github.com/gswly/gomavlib/dialects/common"
 )
 
 //TODO remove
@@ -28,7 +28,7 @@ type TelemetryData struct {
 	Yawspeed    float32 `json:"yawspeed"`
 }
 
-func (td *TelemetryData) SetGlobalPosition(gps *dialect.MessageGlobalPositionInt) {
+func (td *TelemetryData) SetGlobalPosition(gps *common.MessageGlobalPositionInt) {
 	td.Lat = gps.Lat
 	td.Lon = gps.Lon
 	td.Alt = gps.Alt
@@ -39,7 +39,7 @@ func (td *TelemetryData) SetGlobalPosition(gps *dialect.MessageGlobalPositionInt
 	td.Hdg = gps.Hdg
 }
 
-func (td *TelemetryData) SetAttitude(at *dialect.MessageAttitude) {
+func (td *TelemetryData) SetAttitude(at *common.MessageAttitude) {
 	td.Roll = at.Roll
 	td.Pitch = at.Pitch
 	td.Yaw = at.Yaw

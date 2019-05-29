@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/gswly/gomavlib"
-	dialect "github.com/gswly/gomavlib/dialects/common"
+	"github.com/gswly/gomavlib/dialects/common"
 )
 
 const GlobalPositionInt = 33
@@ -15,8 +15,8 @@ type stateHolder struct {
 }
 
 type stateData struct {
-	GlobalPosition *dialect.MessageGlobalPositionInt
-	Attitude       *dialect.MessageAttitude
+	GlobalPosition *common.MessageGlobalPositionInt
+	Attitude       *common.MessageAttitude
 	TelemetryData  *TelemetryData
 }
 
@@ -33,13 +33,13 @@ func (s *stateHolder) startStateHolder(packetChan chan *gomavlib.EventFrame, dbF
 }
 
 func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
-	if gps, ok := packet.Message().(*dialect.MessageGlobalPositionInt); ok {
+	if gps, ok := packet.Message().(*common.MessageGlobalPositionInt); ok {
 		s.stateData.GlobalPosition = gps
 		s.stateData.TelemetryData.SetGlobalPosition(gps)
 		s.insertIntoDb(s.stateData.GlobalPosition, GlobalPositionInt)
 	}
 
-	if att, ok := packet.Message().(*dialect.MessageAttitude); ok {
+	if att, ok := packet.Message().(*common.MessageAttitude); ok {
 		s.stateData.Attitude = att
 		s.stateData.TelemetryData.SetAttitude(att)
 		s.insertIntoDb(s.stateData.Attitude, AttitudeInt)
