@@ -2,81 +2,31 @@ package main
 
 import (
 	"fmt"
-	"github.com/jacobsa/go-serial/serial"
-	"github.com/ungerik/go-mavlink"
-	"io"
-	"log"
+	"github.com/gswly/gomavlib"
+	"github.com/gswly/gomavlib/dialects/ardupilotmega"
+	"strconv"
 )
 
-const frameSize = 1
-const frameStart = 0xFD
+func StartReader(portName string, baudRate int, outChan chan *gomavlib.EventFrame) {
 
-func StartReader(portName string, baudRate uint, outChan chan *mavlink.MavPacket) {
-
-	options1 := serial.OpenOptions{
-		PortName:        portName,
-		BaudRate:        baudRate,
-		DataBits:        8,
-		StopBits:        1,
-		MinimumReadSize: 4,
-	}
-
-	port, err := serial.Open(options1)
-
+	node, err := gomavlib.NewNode(gomavlib.NodeConf{
+		Endpoints: []gomavlib.EndpointConf{
+			gomavlib.EndpointSerial{Address: portName + ":" + strconv.Itoa(baudRate)},
+		},
+		Dialect:     ardupilotmega.Dialect,
+		OutSystemId: 10,
+	})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
+	defer node.Close()
 
-	defer port.Close()
-
-	readerLoop(port, outChan)
-}
-
-func readerLoop(port io.ReadWriteCloser, outChan chan *mavlink.MavPacket) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Recovering from a parser error")
-			readerLoop(port, outChan)
-		}
-	}()
-
-	parser := mavlink.GetMavParser()
-
-	bytes := make([]byte, frameSize)
-
-	startFound := false
 	for {
-		n := read(port, &bytes)
-		if n > 0 {
-			for _, b := range bytes[:n] {
-				if !startFound {
-					if b == frameStart {
-						startFound = true
-					}
-				}
-				var packet *mavlink.MavPacket
-				var err error
-				if startFound {
-					packet, err = parser(b)
-				}
-				if err != nil {
-					//	log.Fatal(err)
-
-				} else if packet != nil {
-					outChan <- packet
-					startFound = false
-				}
+		for evt := range node.Events() {
+			if frm, ok := evt.(*gomavlib.EventFrame); ok {
+				fmt.Printf("received: id=%d, %+v\n", frm.Message().GetId(), frm.Message())
+				outChan <- frm
 			}
 		}
 	}
-}
-
-func read(port io.ReadWriteCloser, bytes *[]byte) int {
-	n, err := port.Read(*bytes)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return n
 }

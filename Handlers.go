@@ -17,7 +17,7 @@ func startHttpServer(data *stateData) {
 }
 
 func getGps(w http.ResponseWriter, r *http.Request) {
-	if err := json.NewEncoder(w).Encode(state.GlobalPositionInt); err != nil {
+	if err := json.NewEncoder(w).Encode(state.GlobalPosition); err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return

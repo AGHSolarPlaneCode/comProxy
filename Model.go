@@ -1,13 +1,15 @@
 package main
 
-import "github.com/ungerik/go-mavlink"
+import (
+	dialect "github.com/gswly/gomavlib/dialects/common"
+)
 
 //TODO remove
 /*
 Not so fast.
 Json field names created using mavlink.GlobalPositionInt class have capitalised first letters.
-
 */
+//TODO remove remove
 
 type TelemetryData struct {
 	Lat         int32   `json:"lat"`
@@ -26,7 +28,7 @@ type TelemetryData struct {
 	Yawspeed    float32 `json:"yawspeed"`
 }
 
-func (td *TelemetryData) SetGlobalPosition(gps *mavlink.GlobalPositionInt) {
+func (td *TelemetryData) SetGlobalPosition(gps *dialect.MessageGlobalPositionInt) {
 	td.Lat = gps.Lat
 	td.Lon = gps.Lon
 	td.Alt = gps.Alt
@@ -37,7 +39,7 @@ func (td *TelemetryData) SetGlobalPosition(gps *mavlink.GlobalPositionInt) {
 	td.Hdg = gps.Hdg
 }
 
-func (td *TelemetryData) SetAttitude(at *mavlink.Attitude) {
+func (td *TelemetryData) SetAttitude(at *dialect.MessageAttitude) {
 	td.Roll = at.Roll
 	td.Pitch = at.Pitch
 	td.Yaw = at.Yaw

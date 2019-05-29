@@ -2,7 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/ungerik/go-mavlink"
+	"github.com/gswly/gomavlib"
+	dialect "github.com/gswly/gomavlib/dialects/common"
 )
 
 const GlobalPositionInt = 33
@@ -14,44 +15,34 @@ type stateHolder struct {
 }
 
 type stateData struct {
-	GlobalPositionInt *mavlink.GlobalPositionInt
-	Attitude          *mavlink.Attitude
-	TelemetryData     *TelemetryData
+	GlobalPosition *dialect.MessageGlobalPositionInt
+	Attitude       *dialect.MessageAttitude
+	TelemetryData  *TelemetryData
 }
 
-func (sd *stateData) updateGP() {
-	sd.TelemetryData.SetGlobalPosition(sd.GlobalPositionInt)
-}
-
-func (sd *stateData) updateAT() {
-	sd.TelemetryData.SetAttitude(sd.Attitude)
-}
-
-func (s *stateHolder) startStateHolder(packetChan chan *mavlink.MavPacket, dbFilename string) {
+func (s *stateHolder) startStateHolder(packetChan chan *gomavlib.EventFrame, dbFilename string) {
 	s.stateData = stateData{}
-	s.stateData.TelemetryData = &TelemetryData{}
 	s.db = DbWrapper{}
 	s.db.initialize(dbFilename)
 
-	var packet *mavlink.MavPacket
+	var packet *gomavlib.EventFrame
 	for {
 		packet = <-packetChan
 		s.processPacket(packet)
 	}
 }
 
-func (s *stateHolder) processPacket(packet *mavlink.MavPacket) {
-	switch packet.Msg.ID() {
-	case GlobalPositionInt:
-		s.stateData.GlobalPositionInt = packet.Msg.(*mavlink.GlobalPositionInt)
-		s.stateData.updateGP()
-		s.insertIntoDb(s.stateData.GlobalPositionInt, GlobalPositionInt)
-		break
-	case AttitudeInt:
-		s.stateData.Attitude = packet.Msg.(*mavlink.Attitude)
-		s.stateData.updateAT()
+func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
+	if gps, ok := packet.Message().(*dialect.MessageGlobalPositionInt); ok {
+		s.stateData.GlobalPosition = gps
+		s.stateData.TelemetryData.SetGlobalPosition(gps)
+		s.insertIntoDb(s.stateData.GlobalPosition, GlobalPositionInt)
+	}
+
+	if att, ok := packet.Message().(*dialect.MessageAttitude); ok {
+		s.stateData.Attitude = att
+		s.stateData.TelemetryData.SetAttitude(att)
 		s.insertIntoDb(s.stateData.Attitude, AttitudeInt)
-		break
 	}
 	//TODO add information about last update time
 }
