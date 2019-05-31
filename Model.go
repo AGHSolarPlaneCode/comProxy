@@ -29,10 +29,10 @@ type TelemetryData struct {
 }
 
 type GpsData struct {
-	Lat    int32
-	Lon    int32
-	LatRaw int32
-	LonRaw int32
+	Lat    int32 `json:"lat"`
+	Lon    int32 `json:"lon"`
+	LatRaw int32 `json:"latraw"`
+	LonRaw int32 `json:"lonraw"`
 }
 
 func (td *TelemetryData) SetGlobalPosition(gps *common.MessageGlobalPositionInt) {

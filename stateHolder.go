@@ -17,13 +17,12 @@ type stateHolder struct {
 }
 
 type stateData struct {
+	GpsData        *GpsData
+	TelemetryData  *TelemetryData
 	GlobalPosition *common.MessageGlobalPositionInt
 	Attitude       *common.MessageAttitude
 	GpsRaw         *common.MessageGpsRawInt
 	HudData        *common.MessageVfrHud
-	GpsData        *GpsData
-
-	TelemetryData *TelemetryData
 }
 
 func (s *stateHolder) startStateHolder(packetChan chan *gomavlib.EventFrame, dbFilename string) {

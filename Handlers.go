@@ -11,17 +11,17 @@ var state *stateData
 func startHttpServer(data *stateData) {
 	state = data
 	http.HandleFunc("/gps", getGps)
-	http.HandleFunc("/attitude", getAttitude)
+	http.HandleFunc("/currTele", getCurrentTelemetry)
 	http.HandleFunc("/position", getGlobalPosition)
 	http.HandleFunc("/positionRaw", getRawGps)
+	http.HandleFunc("/attitude", getAttitude)
 	http.HandleFunc("/hud", getHud)
-	http.HandleFunc("/currTele", getCurrentTelemetry)
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }
 
 func getGps(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(state.GpsData); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -30,7 +30,7 @@ func getGps(w http.ResponseWriter, r *http.Request) {
 
 func getAttitude(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(state.Attitude); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -39,7 +39,7 @@ func getAttitude(w http.ResponseWriter, r *http.Request) {
 
 func getCurrentTelemetry(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(state.TelemetryData); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -48,7 +48,7 @@ func getCurrentTelemetry(w http.ResponseWriter, r *http.Request) {
 
 func getGlobalPosition(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(state.GlobalPosition); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -56,14 +56,14 @@ func getGlobalPosition(w http.ResponseWriter, r *http.Request) {
 
 func getRawGps(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(state.GpsRaw); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
 func getHud(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(state.HudData); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
