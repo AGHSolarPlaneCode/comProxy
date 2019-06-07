@@ -14,6 +14,8 @@ Json field names created using mavlink.GlobalPositionInt class have capitalised 
 type TelemetryData struct {
 	Lat         int32   `json:"lat"`
 	Lon         int32   `json:"lon"`
+	LatRaw      int32   `json:"latRaw"`
+	LonRaw      int32   `json:"lonRaw"`
 	Alt         int32   `json:"alt"`
 	RelativeAlt int32   `json:"relativealt"`
 	Vx          int16   `json:"vx"`
@@ -53,6 +55,11 @@ func (td *TelemetryData) SetAttitude(at *common.MessageAttitude) {
 	td.Rollspeed = at.Rollspeed
 	td.Pitchspeed = at.Pitchspeed
 	td.Yawspeed = at.Yawspeed
+}
+
+func (td *TelemetryData) SetRawGps(raw *common.MessageGpsRawInt) {
+	td.LonRaw = raw.Lon
+	td.LatRaw = raw.Lon
 }
 
 func (gps *GpsData) SetGlobalPositionInt(pos *common.MessageGlobalPositionInt) {

@@ -55,6 +55,7 @@ func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
 
 	if mess, ok := packet.Message().(*common.MessageGpsRawInt); ok {
 		s.stateData.GpsData.SetRawGps(mess)
+		s.stateData.TelemetryData.SetRawGps(mess)
 		s.stateData.GpsRaw = mess
 		s.insertIntoDb(s.stateData.GpsRaw, RawGps)
 	}
