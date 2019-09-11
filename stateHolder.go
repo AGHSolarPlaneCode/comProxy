@@ -65,6 +65,9 @@ func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
 		s.insertIntoDb(s.stateData.HudData, Hud)
 	}
 
+	if status, ok := packet.Message().(*common.MessageSysStatus); ok {
+		s.stateData.TelemetryData.SetBatteryStatus(status)
+	}
 	//TODO add information about last update time
 }
 

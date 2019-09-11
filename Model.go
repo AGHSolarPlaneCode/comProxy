@@ -12,22 +12,24 @@ Json field names created using mavlink.GlobalPositionInt class have capitalised 
 //TODO remove remove
 
 type TelemetryData struct {
-	Lat         int32   `json:"lat"`
-	Lon         int32   `json:"lon"`
-	LatRaw      int32   `json:"latRaw"`
-	LonRaw      int32   `json:"lonRaw"`
-	Alt         int32   `json:"alt"`
-	RelativeAlt int32   `json:"relativealt"`
-	Vx          int16   `json:"vx"`
-	Vy          int16   `json:"vy"`
-	Vz          int16   `json:"vz"`
-	Hdg         uint16  `json:"hdg"`
-	Roll        float32 `json:"roll"`
-	Pitch       float32 `json:"pitch"`
-	Yaw         float32 `json:"yaw"`
-	Rollspeed   float32 `json:"rollspeed"`
-	Pitchspeed  float32 `json:"pitchspeed"`
-	Yawspeed    float32 `json:"yawspeed"`
+	Lat              int32   `json:"lat"`
+	Lon              int32   `json:"lon"`
+	LatRaw           int32   `json:"latRaw"`
+	LonRaw           int32   `json:"lonRaw"`
+	Alt              int32   `json:"alt"`
+	RelativeAlt      int32   `json:"relativealt"`
+	Vx               int16   `json:"vx"`
+	Vy               int16   `json:"vy"`
+	Vz               int16   `json:"vz"`
+	Hdg              uint16  `json:"hdg"`
+	Roll             float32 `json:"roll"`
+	Pitch            float32 `json:"pitch"`
+	Yaw              float32 `json:"yaw"`
+	Rollspeed        float32 `json:"rollspeed"`
+	Pitchspeed       float32 `json:"pitchspeed"`
+	Yawspeed         float32 `json:"yawspeed"`
+	VoltageBattery   uint16  `json:"voltage_battery"`
+	BatteryRemaining int8    `json:"battery_remaining"`
 }
 
 type GpsData struct {
@@ -60,6 +62,11 @@ func (td *TelemetryData) SetAttitude(at *common.MessageAttitude) {
 func (td *TelemetryData) SetRawGps(raw *common.MessageGpsRawInt) {
 	td.LonRaw = raw.Lon
 	td.LatRaw = raw.Lon
+}
+
+func (td *TelemetryData) SetBatteryStatus(status *common.MessageSysStatus) {
+	td.BatteryRemaining = status.BatteryRemaining
+	td.VoltageBattery = status.VoltageBattery
 }
 
 func (gps *GpsData) SetGlobalPositionInt(pos *common.MessageGlobalPositionInt) {
