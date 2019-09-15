@@ -10,6 +10,7 @@ const GlobalPositionInt = 33
 const AttitudeInt = 30
 const RawGps = 24
 const Hud = 74
+const SysStatus = 1
 
 type stateHolder struct {
 	stateData stateData
@@ -62,11 +63,13 @@ func (s *stateHolder) processPacket(packet *gomavlib.EventFrame) {
 
 	if mess, ok := packet.Message().(*common.MessageVfrHud); ok {
 		s.stateData.HudData = mess
+		s.stateData.TelemetryData.SetAirSpeed(mess)
 		s.insertIntoDb(s.stateData.HudData, Hud)
 	}
 
 	if status, ok := packet.Message().(*common.MessageSysStatus); ok {
 		s.stateData.TelemetryData.SetBatteryStatus(status)
+		s.insertIntoDb(status, SysStatus)
 	}
 	//TODO add information about last update time
 }
